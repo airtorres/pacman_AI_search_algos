@@ -288,6 +288,12 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        # initialize all four corners to False (not visited yet)
+        # structure of cornersBoolean: { corner_coordinate: boolean }
+        cornersBoolean = {}
+        for corn in self.corners:
+            cornersBoolean[corn] = False
+        self.startState = (self.startingPosition, cornersBoolean)
 
     def getStartState(self):
         """
@@ -295,6 +301,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        return self.startState
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -302,6 +309,12 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        # if all four corners are visited, then goalState is reached.
+        cornersBoolean = state[1]
+        isGoal = True
+        for corn in cornersBoolean:
+            isGoal = (cornersBoolean[corn] and isGoal)
+        return isGoal
         util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -325,6 +338,33 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            nextState = (nextx, nexty)
+            cornersBoolean = state[1]
+            newCornersBoolean = {}
+            # if the next coordinate is not wall (means that pacman can move on that coordinate),
+            # then, check if the next coordinate is one of the corners.
+            if not hitsWall:
+                if nextState in self.corners:
+                    # if next state is one of the corners,
+                    # update the boolean value of that corner to True
+                    # (which means that this corner is reached at this state).
+                    for corn in cornersBoolean:
+                        if corn == nextState:
+                            newCornersBoolean[corn] = True
+                            continue
+                        newCornersBoolean[corn] = cornersBoolean[corn]
+                    # record this nextState as one of the sucessor of the given state
+                    successor = ((nextState, newCornersBoolean), action,  1)
+                else:
+                    # if next state is not one of the corners,
+                    # record this nextState as one of the sucessor (one of the possible path).
+                    successor = ((nextState, cornersBoolean), action, 1)
+                successors.append(successor)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,7 +400,42 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    currPosition = state[0]
+    cornersBoolean = state[1]
+
+    top = problem.walls.height-2
+    right = problem.walls.width-2
+    notVisitedCorners = []
+
+    # getting all the not visited corners as of the moment
+    for corn in corners:
+        if cornersBoolean[corn] == False:
+            notVisitedCorners.append(corn)
+
+    cost = 0
+    # while there are still unvisited corners,
+    # calculate the manhattan distance from the current position
+    # to each of the unvisited corners.
+    # Visit the nearest corner first.
+    while len(notVisitedCorners) != 0:
+        distances = []
+        for corn in notVisitedCorners:
+            # getting the mahattan distance from the current position upto this corner
+            dist = util.manhattanDistance(currPosition, corn)
+            distances.append(dist)
+        # getting the minimum distance that can be traversed from the current position
+        minDistance = min(distances)
+        # cost is added with the distance from the current position upto this nearest corner
+        cost = cost + minDistance
+        # set the nearest corner as the current position
+        currPosition = notVisitedCorners[distances.index(minDistance)]
+        # remove this corner from the notVisitedCorners
+        # (setting this corner as visited)
+        notVisitedCorners.remove(currPosition)
+
+    # return the total cost of visiting all the unvisited corners from the current state position
+    return cost
+    # return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
