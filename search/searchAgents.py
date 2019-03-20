@@ -529,7 +529,46 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foodlist = foodGrid.asList()
+
+    # if there is no more food, return 0
+    if len(foodlist) == 0:
+        return 0
+
+    cost = 0
+    currPosition = position
+    # while there are still unvisited corners,
+    # calculate the manhattan distance from the current position
+    # to each of the unvisited corners.
+    # Visit the nearest corner first.
+    # while len(foodlist) != 0:
+    #     distances = []
+    #     for food in foodlist:
+    #         # getting the mahattan distance from the current position upto this corner
+
+    #         dist = util.manhattanDistance(currPosition, food)
+    #         # dist = mazeDistance(currPosition, food, problem.startingGameState)
+    #         # dist = min(util.manhattanDistance(currPosition, food), mazeDistance(currPosition, food, problem.startingGameState))
+
+    #         distances.append(dist)
+    #     # getting the minimum distance that can be traversed from the current position
+    #     minDistance = min(distances)
+    #     # cost is added with the distance from the current position upto this nearest corner
+    #     cost = cost + minDistance
+    #     # set the nearest corner as the current position
+    #     currPosition = foodlist[distances.index(minDistance)]
+    #     # remove this corner from the notVisitedCorners
+    #     # (setting this corner as visited)
+    #     foodlist.remove(currPosition)
+
+    distances = []
+    for food in foodlist:
+        dist = mazeDistance(currPosition, food, problem.startingGameState) # 8K nodes expanded - admissible! but slow huehue
+        # dist = util.manhattanDistance(currPosition, food) => 11K nodes expanded - not admissible
+        distances.append(dist)
+    return sum(distances)/len(foodlist)
+
+    # return cost
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -560,6 +599,15 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+        # imported UCS method from search.py and used to get the path to the closest dot.
+        return search.uniformCostSearch(problem)
+
+        # imported BFS method from search.py and used to get the path to the closest dot.
+        # return search.breadthFirstSearch(problem)
+
+        # imported DFS method from search.py and used to get the path to the closest dot.
+        # return search.depthFirstSearch(problem)
+
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -596,6 +644,13 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
+        # this food matrix contains T or F values on the coordinates
+        food = self.food
+        # the goal is found when pacman's position (x,y) is equals has food (True) - the closest food.
+        if (food[x][y] == True):
+            return True
+        else:
+            return False
         util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
