@@ -86,48 +86,67 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
+
     "*** YOUR CODE HERE ***"
-    start = problem.getStartState()
-    c = problem.getStartState()
-    exploredState = []
-    exploredState.append(start)
-    states = util.Stack()
-    stateTuple = (start, [])
-    states.push(stateTuple)
-    while not states.isEmpty() and not problem.isGoalState(c):
-        state, actions = states.pop()
-        exploredState.append(state)
+    curr = problem.getStartState()
+    visited_nodes = [] #array where we store already explored states
+    output = [] # keeps track of the actions/directions from start state to goal state
+
+    stack = util.Stack() # stack data structure from util
+    stack.push((curr, [], 0)) 
+
+    while not problem.isGoalState(curr): 
+        node = stack.pop() # pop the recently pushed from the stack
+        state = node[0]
+        actions = node[1]
+        cost = node[2]
+
+        if problem.isGoalState(state): # check if the current state is already the goal state
+            return actions
+
+        visited_nodes.append(state) # 
         successor = problem.getSuccessors(state)
-        for i in successor:
-            coordinates = i[0]
-            if not coordinates in exploredState:
-                c = i[0]
-                direction = i[1]
-                states.push((coordinates, actions + [direction]))
-    return actions + [direction]
+        for child in successor:
+            if not child[0] in visited_nodes:
+                curr = child[0]
+                direction = child[1]
+                output = actions + [direction]
+                stack.push((child[0], actions + [direction], cost + child[2]))
+    return output
+
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+
     "*** YOUR CODE HERE ***"
-    start = problem.getStartState()
-    exploredState = []
-    exploredState.append(start)
-    states = util.Queue()
-    stateTuple = (start, [])
-    states.push(stateTuple)
-    while not states.isEmpty():
-        state, action = states.pop()
+    curr = problem.getStartState()
+    visited_nodes = [] #array where we store already explored states
+    output = [] # keeps track of the actions/directions from start state to goal state
+
+    visited_nodes.append(curr)
+    queue = util.Queue()
+    queue.push((curr, [], 0))
+
+    while not problem.isGoalState(curr):
+        node = queue.pop()
+        state = node[0]
+        actions = node[1]
+        cost = node[2]
+
         if problem.isGoalState(state):
-            return action
+            return actions
+
         successor = problem.getSuccessors(state)
-        for i in successor:
-            coordinates = i[0]
-            if not coordinates in exploredState:
-                direction = i[1]
-                exploredState.append(coordinates)
-                states.push((coordinates, action + [direction]))
-    return action
+        for child in successor:
+            if child[0] not in visited_nodes:
+                direction = child[1]
+                visited_nodes.append(child[0])
+                output = actions + [direction]
+                queue.push((child[0], actions + [direction], cost + child[2]))
+
+    return output
+
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
