@@ -104,13 +104,21 @@ def depthFirstSearch(problem):
         if problem.isGoalState(state): # check if the current state is already the goal state
             return actions
 
-        visited_nodes.append(state) # 
-        successor = problem.getSuccessors(state)
+        visited_nodes.append(state) # append the state to visited nodes after popping from the stack
+        successor = problem.getSuccessors(state) # get the state's successor
+
         for child in successor:
+            # for each state's successor
+            # check if it already exists in the visited nodes
             if not child[0] in visited_nodes:
+                # update the 'curr' with the previous current state's successor
                 curr = child[0]
+                # get the successor's direction
                 direction = child[1]
+                # add the new path in 'output' from prev path and next path
+                # in order to keep track of the direction from prev state going to the next state (successsor)
                 output = actions + [direction]
+                # push the state to the stack with direction and cost
                 stack.push((child[0], actions + [direction], cost + child[2]))
     return output
 
@@ -120,29 +128,35 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
 
     "*** YOUR CODE HERE ***"
-    curr = problem.getStartState()
+    curr = problem.getStartState() # get the start state
     visited_nodes = [] #array where we store already explored states
     output = [] # keeps track of the actions/directions from start state to goal state
 
-    visited_nodes.append(curr)
-    queue = util.Queue()
+    visited_nodes.append(curr) # append the current to visited nodes
+    queue = util.Queue() # queue data structure from util
     queue.push((curr, [], 0))
 
     while not problem.isGoalState(curr):
-        node = queue.pop()
+        node = queue.pop() # pop from queue
         state = node[0]
         actions = node[1]
         cost = node[2]
 
-        if problem.isGoalState(state):
+        if problem.isGoalState(state): # check if the current state is already the goal state
             return actions
 
-        successor = problem.getSuccessors(state)
+        successor = problem.getSuccessors(state) # get the state's successor
         for child in successor:
+            # for each state's successor
+            # check if it already exists in the visited nodes
             if child[0] not in visited_nodes:
+                # get the successor's direction
                 direction = child[1]
+                # append the current state(successor) to visited nodes
                 visited_nodes.append(child[0])
+                # add the new path in 'output' from prev path and next path
                 output = actions + [direction]
+                # push the state to the queue with direction and cost
                 queue.push((child[0], actions + [direction], cost + child[2]))
 
     return output

@@ -537,38 +537,17 @@ def foodHeuristic(state, problem):
 
     cost = 0
     currPosition = position
-    # while there are still unvisited corners,
-    # calculate the manhattan distance from the current position
-    # to each of the unvisited corners.
-    # Visit the nearest corner first.
-    # while len(foodlist) != 0:
-    #     distances = []
-    #     for food in foodlist:
-    #         # getting the mahattan distance from the current position upto this corner
-
-    #         dist = util.manhattanDistance(currPosition, food)
-    #         # dist = mazeDistance(currPosition, food, problem.startingGameState)
-    #         # dist = min(util.manhattanDistance(currPosition, food), mazeDistance(currPosition, food, problem.startingGameState))
-
-    #         distances.append(dist)
-    #     # getting the minimum distance that can be traversed from the current position
-    #     minDistance = min(distances)
-    #     # cost is added with the distance from the current position upto this nearest corner
-    #     cost = cost + minDistance
-    #     # set the nearest corner as the current position
-    #     currPosition = foodlist[distances.index(minDistance)]
-    #     # remove this corner from the notVisitedCorners
-    #     # (setting this corner as visited)
-    #     foodlist.remove(currPosition)
 
     distances = []
+    # for each coordinate with food,
+    # get the maze distance between a food and the current position
     for food in foodlist:
-        dist = mazeDistance(currPosition, food, problem.startingGameState) # 8K nodes expanded - admissible! but slow huehue
-        # dist = util.manhattanDistance(currPosition, food) => 11K nodes expanded - not admissible
+        dist = mazeDistance(currPosition, food, problem.startingGameState)
         distances.append(dist)
-    return sum(distances)/len(foodlist)
+    # getting the average distances and use as the heuristics
+    cost = sum(distances)/len(foodlist)
 
-    # return cost
+    return cost
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -600,13 +579,16 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
         # imported UCS method from search.py and used to get the path to the closest dot.
-        return search.uniformCostSearch(problem)
+        # return search.uniformCostSearch(problem)
 
         # imported BFS method from search.py and used to get the path to the closest dot.
         # return search.breadthFirstSearch(problem)
 
         # imported DFS method from search.py and used to get the path to the closest dot.
         # return search.depthFirstSearch(problem)
+
+        # imported A* method from search.py and used to get the path to the closest dot.
+        return search.aStarSearch(problem)
 
         util.raiseNotDefined()
 
