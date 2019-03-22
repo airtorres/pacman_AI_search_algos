@@ -535,19 +535,18 @@ def foodHeuristic(state, problem):
     if len(foodlist) == 0:
         return 0
 
-    cost = 0
     currPosition = position
 
     distances = []
     # for each coordinate with food,
-    # get the maze distance between a food and the current position
+    # get the actual maze distance between a food and the current position
     for food in foodlist:
         dist = mazeDistance(currPosition, food, problem.startingGameState)
         distances.append(dist)
-    # getting the average distances and use as the heuristics
-    cost = sum(distances)/len(foodlist)
+    # use the distance of the farthest food as the heuristics
+    farthest = max(distances)
 
-    return cost
+    return farthest
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -578,17 +577,8 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        # imported UCS method from search.py and used to get the path to the closest dot.
-        # return search.uniformCostSearch(problem)
-
-        # imported BFS method from search.py and used to get the path to the closest dot.
-        # return search.breadthFirstSearch(problem)
-
-        # imported DFS method from search.py and used to get the path to the closest dot.
-        # return search.depthFirstSearch(problem)
-
-        # imported A* method from search.py and used to get the path to the closest dot.
-        return search.aStarSearch(problem)
+        # imported uniformCostSearch method from search.py and used to get the path to the closest dot.
+        return search.uniformCostSearch(problem)
 
         util.raiseNotDefined()
 
